@@ -20,6 +20,7 @@ public class WingToFoundationMove extends Move{
 	public boolean doMove(Solitaire game) {
 		if (!this.valid(game)) { return false; };
 		
+		
 		foundationPile.add(cardBeingDragged);
 		game.updateScore(+100);
 		return true;
@@ -35,7 +36,7 @@ public class WingToFoundationMove extends Move{
 		if (wingPile.empty()) {return false;}
 		
 		Card topFoundationCard = foundationPile.peek();
-		if (cardBeingDragged.sameSuit(topFoundationCard)) {
+		if (cardBeingDragged.sameSuit(topFoundationCard)) {game.
 			if (cardBeingDragged.getRank() != 1 && cardBeingDragged.compareTo(topFoundationCard) == 1){
 				return true;
 			}

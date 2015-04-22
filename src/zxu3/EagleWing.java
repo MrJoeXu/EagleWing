@@ -4,6 +4,7 @@ import ks.common.controller.SolitaireMouseMotionAdapter;
 import ks.common.games.Solitaire;
 import ks.common.games.SolitaireUndoAdapter;
 import ks.common.model.BuildablePile;
+import ks.common.model.Card;
 import ks.common.model.Deck;
 import ks.common.model.Pile;
 import ks.common.view.BuildablePileView;
@@ -17,17 +18,13 @@ import ks.launcher.Main;
 public class EagleWing extends Solitaire {
 	
 	protected Deck deck;
-	protected Pile wingPile1, wingPile2, wingPile3, wingPile4,
-				   wingPile5, wingPile6, wingPile7, wingPile8;
-	protected Pile foundationPile1, foundationPile2,
-				   foundationPile3, foundationPile4;
+	protected Pile wingPile[] = new Pile [9]; 
+	protected Pile foundationPile[] = new Pile [5];
 	protected Pile reservePile, wastePile;
 	protected BuildablePile trunkPile;
 	
-	protected PileView wingPileView1, wingPileView2, wingPileView3, wingPileView4,
-				       wingPileView5, wingPileView6, wingPileView7, wingPileView8;
-	protected PileView foundationPileView1, foundationPileView2,
-					   foundationPileView3, foundationPileView4;
+	protected PileView wingPileView[] = new PileView [9];
+	protected PileView foundationPileView[] = new PileView[5];
 	protected PileView wastePileView;
 	protected BuildablePileView trunkPileView;
 	protected DeckView deckView;
@@ -37,6 +34,8 @@ public class EagleWing extends Solitaire {
 	
 	protected StringView startString;
 	protected StringView scoreString;
+	
+	protected Card foundationCard;
 
 	@Override
 	public String getName() {
@@ -53,6 +52,7 @@ public class EagleWing extends Solitaire {
 		initializeModel(getSeed());
 		initializeView();
 		intiializeController();
+		
 	}
 	
 
@@ -65,41 +65,23 @@ public class EagleWing extends Solitaire {
 		deckView.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
 		deckView.setUndoAdapter (new SolitaireUndoAdapter(this));
 		
-		wastePileView.setMouseAdapter(new EagleWingWastePileController (this, deck, wastePile));
+		for (int i=1; i<=8; i++) {
+			wingPileView[i].setMouseAdapter(new EagleWingWingPileController (this, wingPileView[i]));
+			wingPileView[i].setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
+			wingPileView[i].setUndoAdapter (new SolitaireUndoAdapter(this));
+		}
+		
+		wastePileView.setMouseAdapter(new EagleWingWastePileController (this, deck, wastePileView));
 		wastePileView.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
 		wastePileView.setUndoAdapter (new SolitaireUndoAdapter(this));
 		
-		wingPileView1.setMouseAdapter(new EagleWingWingPileController (this, wingPileView1));
-		wingPileView1.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView1.setUndoAdapter (new SolitaireUndoAdapter(this));
+		for (int i=1; i<=4; i++) {
+			foundationPileView[i].setMouseAdapter(new EagleWingFoundationController (this, foundationPileView[i]));
+			foundationPileView[i].setMouseMotionAdapter(new SolitaireMouseMotionAdapter(this));
+			foundationPileView[i].setUndoAdapter(new SolitaireUndoAdapter(this));
+		}
+
 		
-		wingPileView2.setMouseAdapter(new EagleWingWingPileController (this, wingPileView2));
-		wingPileView2.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView2.setUndoAdapter (new SolitaireUndoAdapter(this));
-		
-		wingPileView3.setMouseAdapter(new EagleWingWingPileController (this, wingPileView3));
-		wingPileView3.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView3.setUndoAdapter (new SolitaireUndoAdapter(this));
-		
-		wingPileView4.setMouseAdapter(new EagleWingWingPileController (this, wingPileView4));
-		wingPileView4.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView4.setUndoAdapter (new SolitaireUndoAdapter(this));
-		
-		wingPileView5.setMouseAdapter(new EagleWingWingPileController (this, wingPileView5));
-		wingPileView5.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView5.setUndoAdapter (new SolitaireUndoAdapter(this));
-		
-		wingPileView6.setMouseAdapter(new EagleWingWingPileController (this, wingPileView6));
-		wingPileView6.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView6.setUndoAdapter (new SolitaireUndoAdapter(this));
-		
-		wingPileView7.setMouseAdapter(new EagleWingWingPileController (this, wingPileView7));
-		wingPileView7.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView7.setUndoAdapter (new SolitaireUndoAdapter(this));
-		
-		wingPileView8.setMouseAdapter(new EagleWingWingPileController (this, wingPileView8));
-		wingPileView8.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
-		wingPileView8.setUndoAdapter (new SolitaireUndoAdapter(this));
 		
 	}
 
@@ -112,73 +94,44 @@ public class EagleWing extends Solitaire {
 		
 		startString = new StringView("START");
 		startString.setFontSize(20);
-		startString.setBounds(643,28, 70, 27);
+		startString.setBounds(643,10, 70, 27);
 		container.addWidget(startString);
 		
-		wingPileView1 = new PileView (wingPile1);
-		wingPileView1.setBounds(20, 184, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView1);
+		for (int f=1; f<=4; f++) {
+			wingPileView[f] = new PileView (wingPile[f]);
+			wingPileView[f].setBounds(20+(f-1)*73, 184-(f-1)*30, ci.getWidth(), ci.getHeight());
+			container.addWidget(wingPileView[f]);
+		}
 		
-		wingPileView2 = new PileView (wingPile2);
-		wingPileView2.setBounds(93, 154, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView2);
+		for (int g=5; g<=8; g++) {
+			wingPileView[g] = new PileView (wingPile[g]);
+			wingPileView[g].setBounds(457+(g-5)*73, 94+(g-5)*30, ci.getWidth(), ci.getHeight());
+			container.addWidget(wingPileView[g]);
+			
+		}
 		
-		wingPileView3 = new PileView (wingPile3);
-		wingPileView3.setBounds(166, 124, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView3);
-		
-		wingPileView4 = new PileView (wingPile4);
-		wingPileView4.setBounds(239, 94, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView4);
-		
-		wingPileView5 = new PileView (wingPile5);
-		wingPileView5.setBounds(457, 94, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView5);
-		
-		wingPileView6 = new PileView (wingPile6);
-		wingPileView6.setBounds(530, 123, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView6);
-		
-		wingPileView7 = new PileView (wingPile7);
-		wingPileView7.setBounds(603, 153, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView7);
-		
-		wingPileView8 = new PileView (wingPile8);
-		wingPileView8.setBounds(676, 183, ci.getWidth(), ci.getHeight());
-		container.addWidget(wingPileView8);
-		
-		foundationPileView1 = new PileView (foundationPile1);
-		foundationPileView1.setBounds(238, 431, ci.getWidth(), ci.getHeight());
-		container.addWidget(foundationPileView1);
-		
-		foundationPileView2 = new PileView (foundationPile2);
-		foundationPileView2.setBounds(311, 431, ci.getWidth(), ci.getHeight());
-		container.addWidget(foundationPileView2);
-		
-		foundationPileView3 = new PileView (foundationPile3);
-		foundationPileView3.setBounds(384, 431, ci.getWidth(), ci.getHeight());
-		container.addWidget(foundationPileView3);
-		
-		foundationPileView4 = new PileView (foundationPile4);
-		foundationPileView4.setBounds(457, 431, ci.getWidth(), ci.getHeight());
-		container.addWidget(foundationPileView4);
+		for (int i=1; i<=4; i++) {
+			foundationPileView[i] = new PileView (foundationPile[i]);
+			foundationPileView[i].setBounds(238+(i-1)*73, 431, ci.getWidth(), ci.getHeight());
+			container.addWidget(foundationPileView[i]);
+		}
 		
 		wastePileView = new PileView (wastePile);
 		wastePileView.setBounds(606, 431, ci.getWidth(), ci.getHeight());
 		container.addWidget(wastePileView); 
 		
 		trunkPileView = new BuildablePileView (trunkPile);
-		trunkPileView.setBounds(348, 3, ci.getWidth(), 395);
+		trunkPileView.setBounds(348, 75, ci.getWidth(), 200);
 		container.addWidget(trunkPileView);
 		
 		scoreView = new IntegerView (this.getScore());
 		scoreView.setFontSize(20);
-		scoreView.setBounds(121, 24, 73, 27);
+		scoreView.setBounds(408, 10, 73, 27);
 		container.addWidget(scoreView);
 		
 		scoreString = new StringView ("SCORE:");
 		scoreString.setFontSize(20);
-		scoreString.setBounds(48, 24, 73, 27);
+		scoreString.setBounds(335, 10, 73, 27);
 		container.addWidget(scoreString);
 		
 		numLeftView = new IntegerView (this.getNumLeft());
@@ -192,31 +145,16 @@ public class EagleWing extends Solitaire {
 		deck.create(seed);
 		model.addElement (deck);   // add to our model (as defined within our superclass).
 		
-		wingPile1 = new Pile ("wingPile1");
-		wingPile2 = new Pile ("wingPile2");
-		wingPile3 = new Pile ("wingPile3");
-		wingPile4 = new Pile ("wingPile4");
-		wingPile5 = new Pile ("wingPile5");
-		wingPile6 = new Pile ("wingPile6");
-		wingPile7 = new Pile ("wingPile7");
-		wingPile8 = new Pile ("wingPile8");
-		model.addElement(wingPile1);
-		model.addElement(wingPile2);
-		model.addElement(wingPile3);
-		model.addElement(wingPile4);
-		model.addElement(wingPile5);
-		model.addElement(wingPile6);
-		model.addElement(wingPile7);
-		model.addElement(wingPile8);
+		for (int i=1; i<=8; i++) {
+			wingPile[i] = new Pile ("wingPile"+i);
+			model.addElement(wingPile[i]);
+		}
+
 		
-		foundationPile1 = new Pile ("foundationPile1");
-		foundationPile2 = new Pile ("foundationPile2");
-		foundationPile3 = new Pile ("foundationPile3");
-		foundationPile4 = new Pile ("foundationPile4");
-		model.addElement(foundationPile1);
-		model.addElement(foundationPile2);
-		model.addElement(foundationPile3);
-		model.addElement(foundationPile4);
+		for (int b=1; b<=4; b++) {
+			foundationPile[b] = new Pile ("foundationPile" + b);
+			model.addElement(foundationPile[b]);
+		}
 		
 		reservePile = new Pile("reserve");
 		model.addElement(reservePile);
@@ -231,9 +169,145 @@ public class EagleWing extends Solitaire {
 		this.updateScore(0); 
 	}
 	
+	public boolean isWingPile (Pile p) {
+		for (int i=1; i<=8; i++) {
+			if (wingPile[i] == p && p != wastePile) {return true;}
+		}
+		return false;
+	}
+	
 	public static void main (String []args) {
 		// Seed is to ensure we get the same initial cards every time.
 		// Here the seed is to "order by suit."
 		Main.generateWindow(new EagleWing(), 1234);
 	}
+
+	public Deck getDeck() {
+		return deck;
+	}
+
+	public void setDeck(Deck deck) {
+		this.deck = deck;
+	}
+
+	public Pile[] getWingPile() {
+		return wingPile;
+	}
+
+	public void setWingPile(Pile[] wingPile) {
+		this.wingPile = wingPile;
+	}
+
+	public Pile[] getFoundationPile() {
+		return foundationPile;
+	}
+
+	public void setFoundationPile(Pile[] foundationPile) {
+		this.foundationPile = foundationPile;
+	}
+
+	public Pile getReservePile() {
+		return reservePile;
+	}
+
+	public void setReservePile(Pile reservePile) {
+		this.reservePile = reservePile;
+	}
+
+	public Pile getWastePile() {
+		return wastePile;
+	}
+
+	public void setWastePile(Pile wastePile) {
+		this.wastePile = wastePile;
+	}
+
+	public BuildablePile getTrunkPile() {
+		return trunkPile;
+	}
+
+	public void setTrunkPile(BuildablePile trunkPile) {
+		this.trunkPile = trunkPile;
+	}
+
+	public PileView[] getWingPileView() {
+		return wingPileView;
+	}
+
+	public void setWingPileView(PileView[] wingPileView) {
+		this.wingPileView = wingPileView;
+	}
+
+	public PileView[] getFoundationPileView() {
+		return foundationPileView;
+	}
+
+	public void setFoundationPileView(PileView[] foundationPileView) {
+		this.foundationPileView = foundationPileView;
+	}
+
+	public PileView getWastePileView() {
+		return wastePileView;
+	}
+
+	public void setWastePileView(PileView wastePileView) {
+		this.wastePileView = wastePileView;
+	}
+
+	public BuildablePileView getTrunkPileView() {
+		return trunkPileView;
+	}
+
+	public void setTrunkPileView(BuildablePileView trunkPileView) {
+		this.trunkPileView = trunkPileView;
+	}
+
+	public DeckView getDeckView() {
+		return deckView;
+	}
+
+	public void setDeckView(DeckView deckView) {
+		this.deckView = deckView;
+	}
+
+	public IntegerView getScoreView() {
+		return scoreView;
+	}
+
+	public void setScoreView(IntegerView scoreView) {
+		this.scoreView = scoreView;
+	}
+
+	public IntegerView getNumLeftView() {
+		return numLeftView;
+	}
+
+	public void setNumLeftView(IntegerView numLeftView) {
+		this.numLeftView = numLeftView;
+	}
+
+	public StringView getStartString() {
+		return startString;
+	}
+
+	public void setStartString(StringView startString) {
+		this.startString = startString;
+	}
+
+	public StringView getScoreString() {
+		return scoreString;
+	}
+
+	public void setScoreString(StringView scoreString) {
+		this.scoreString = scoreString;
+	}
+
+	public Card getFoundationCard() {
+		return foundationCard;
+	}
+
+	public void setFoundationCard(Card foundationCard) {
+		this.foundationCard = foundationCard;
+	}
+
 }
