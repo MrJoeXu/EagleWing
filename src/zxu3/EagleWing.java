@@ -44,7 +44,7 @@ public class EagleWing extends Solitaire {
 
 	@Override
 	public boolean hasWon() {
-		return false;
+		return getScoreValue() == 5200;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class EagleWing extends Solitaire {
 		startString.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
 		startString.setUndoAdapter (new SolitaireUndoAdapter(this));
 		
-		deckView.setMouseAdapter(new EagleWingDeckController (this, deck));
+		deckView.setMouseAdapter(new EagleWingDeckController (this, deck)); 
 		deckView.setMouseMotionAdapter (new SolitaireMouseMotionAdapter(this));
 		deckView.setUndoAdapter (new SolitaireUndoAdapter(this));
 		
@@ -80,6 +80,10 @@ public class EagleWing extends Solitaire {
 			foundationPileView[i].setMouseMotionAdapter(new SolitaireMouseMotionAdapter(this));
 			foundationPileView[i].setUndoAdapter(new SolitaireUndoAdapter(this));
 		}
+		
+		trunkPileView.setMouseAdapter(new EagleWingTrunkPileController (trunkPileView, this));
+		trunkPileView.setMouseMotionAdapter(new SolitaireMouseMotionAdapter(this));
+		trunkPileView.setUndoAdapter(new SolitaireUndoAdapter(this));
 
 		
 		

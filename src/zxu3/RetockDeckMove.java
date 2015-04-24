@@ -17,12 +17,13 @@ public class RetockDeckMove extends Move{
 	@Override
 	public boolean doMove(Solitaire game) {
 		if (!this.valid(game)) { return false; }
-		
-		while (!wastePile.empty()) {
+		int wastePileSize = wastePile.count();
+		while (deck.count() != wastePileSize) {
 			Card wasteCard = wastePile.get();
 			wasteCard.setFaceUp(true);
 			deck.add(wasteCard);
 		}
+
 		game.updateNumberCardsLeft(+deck.count());
 		return true;
 	}
@@ -33,7 +34,7 @@ public class RetockDeckMove extends Move{
 			Card wasteCard = deck.get();
 			wastePile.add(wasteCard);
 		}
-		game.updateNumberCardsLeft(-wastePile.count());
+		game.updateNumberCardsLeft(-wastePile.count()); 
 		return true;
 	}
 

@@ -59,6 +59,31 @@ public class EagleWingWingPileController extends java.awt.event.MouseAdapter {
 		src.redraw();
 	}
 	
+	public void mouseReleased(MouseEvent me) {
+		
+	
+		Container c = theGame.getContainer();
+
+		/* Return if there is no card being dragged chosen. */
+		Widget draggingWidget = c.getActiveDraggingObject();
+		if (draggingWidget == Container.getNothingBeingDragged()) {
+			System.err.println ("FoundationController::mouseReleased() unexpectedly found nothing being dragged.");
+			c.releaseDraggingObject();		
+			return;
+		}
+		
+		/** Recover the from BuildablePile OR waste Pile */
+		Widget fromWidget = c.getDragSource();
+		if (fromWidget == null) {
+			System.err.println ("FoundationController::mouseReleased(): somehow no dragSource in container.");
+			c.releaseDraggingObject();
+			return;
+		}
+		
+		fromWidget.returnWidget(draggingWidget);
+		c.releaseDraggingObject();
+		c.repaint();
+	}
 	
 	
 }

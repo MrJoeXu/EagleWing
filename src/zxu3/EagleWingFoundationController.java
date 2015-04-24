@@ -67,25 +67,33 @@ public class EagleWingFoundationController extends MouseAdapter{
 		}
 
 		if (theGame.isWingPile(fromPile)) {
-			System.out.print("trueWing/" +"\n");
-			Move m = new WingToFoundationMove (fromPile, theCard, foundation);
-			System.out.print(fromPile.getName()+"\n");
-			System.out.print(foundation.getName() +"\n");
+			//System.out.print("trueWing/" +"\n");
+			Move m1 = new WingToFoundationMove (fromPile, theCard, foundation, theGame, theGame.getTrunkPile());
+			//System.out.print(fromPile.getName()+"\n");
+			//System.out.print(foundation.getName() +"\n");
 
-			if (theGame.getFoundationCard().getRank() == theCard.getRank()) {
+			//if (theGame.getFoundationCard().getRank() == theCard.getRank()) {
 				
-			}
-			if (m.doMove (theGame)) {
+			//}
+			if (m1.doMove (theGame)) {
 				// Success
-				System.out.print("success\n");
-				theGame.pushMove (m);
+				//System.out.print("success\n");
+				theGame.pushMove (m1);
 				theGame.refreshWidgets();
 			} else {
+				//System.out.print("fail\n");
 				fromWidget.returnWidget (draggingWidget);
 			}
 		}
 		else {
-			fromWidget.returnWidget (draggingWidget);
+			Move m2 = new WasteToFoundationMove (fromPile, theCard, foundation, theGame);
+			if (m2.doMove(theGame)){
+				theGame.pushMove(m2);
+				theGame.refreshWidgets();
+			} else {
+				//System.out.print("fail\n");
+				fromWidget.returnWidget (draggingWidget);
+			}
 		}
 
 		// Ahhhh. Instead of dealing with multiple 'instanceof' difficulty, why don't we allow

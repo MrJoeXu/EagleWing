@@ -22,7 +22,7 @@ public class DeckToWasteMove extends Move {
 		wasteCard.setFaceUp(true);
 		wastePile.add(wasteCard);
 		game.updateNumberCardsLeft(-1);
-		
+		 
 		return true;
 	}
 

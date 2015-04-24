@@ -51,7 +51,7 @@ public class StartMove extends Move{
 	@Override
 	public boolean undo(Solitaire game) {
 		
-		for (int i=0; i<=8; i++) {
+		for (int i=1; i<=8; i++) {
 			deck.add(theGame.wingPile[i].get());
 		}
 		
@@ -66,7 +66,7 @@ public class StartMove extends Move{
 		
 		theGame.updateNumberCardsLeft(+22);
 		
-		return true;
+		return true; 
 		
 	}
 
